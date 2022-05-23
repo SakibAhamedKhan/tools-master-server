@@ -20,6 +20,7 @@ async function run() {
 		await client.connect();
 		const toolsCollections = client.db('tool_master_db').collection('tools');
 		const usersCollections = client.db('tool_master_db').collection('users');
+		const ordersCollections = client.db('tool_master_db').collection('orders');
 
 		
 		// get all tools
@@ -47,6 +48,13 @@ async function run() {
 			const id = req.params.id;
 			const query = {_id: ObjectId(id)}
 			const result = await toolsCollections.findOne(query);
+			res.send(result);
+		})
+		
+		// order in tools
+		app.post('/orders', async(req,res) => {
+			const doc = req.body;
+			const result = await ordersCollections.insertOne(doc);
 			res.send(result);
 		})
 
