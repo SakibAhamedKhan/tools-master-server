@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const app = express();
@@ -41,7 +41,14 @@ async function run() {
 			const token = jwt.sign({email: email}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1h'});
 			res.send({result, token});
 		})
-
+		
+		// get tools by id
+		app.get('/tools/:id', async(req,res) => {
+			const id = req.params.id;
+			const query = {_id: ObjectId(id)}
+			const result = await toolsCollections.findOne(query);
+			res.send(result);
+		})
 
 	}
 	finally{
