@@ -126,6 +126,18 @@ async function run() {
 			res.send(result);
 		})
 
+		// update user profile
+		app.put('/profile/:email', async(req, res) => {
+			const email = req.params.email;
+			const doc = req.body;
+			const filter = {email: email};
+			const updateDoc = {
+				$set: doc
+			}
+			const result = await usersCollections.updateOne(filter,updateDoc);
+			res.send(result);
+		})
+
 	}
 	finally{
 
