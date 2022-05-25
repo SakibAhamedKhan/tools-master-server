@@ -210,6 +210,12 @@ async function run() {
      		res.send(result);
 		})
 
+		// add tool from admin
+		app.post('/addTool', verifyJWT, verifyAdmin, async(req, res) => {
+			const doc = req.body;
+			const result = await toolsCollections.insertOne(doc);
+			res.send(result);
+		})
 	}
 	finally{
 
