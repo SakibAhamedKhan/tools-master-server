@@ -49,6 +49,17 @@ async function run() {
 
 		console.log('mongodb connected');
 
+		// verify admin
+		const verifyAdmin = async (req,res,next) => {
+			const requesterEmail = req.decoded.email;
+			const requesterAccount = await usersCollections.findOne({email: requesterEmail}); 
+			if(requesterAccount.role === 'admin'){
+			  next();
+			} else {
+			  res.status(403).send({message: 'Forbidden Access 😭'});
+			}
+		  }
+
 		// get all tools
 		app.get('/tools', async(req, res) => {
 			const result = await toolsCollections.find().toArray();
@@ -180,6 +191,23 @@ async function run() {
 			const admin = user.role === 'admin';
 			// console.log(admin);
 			res.send({admin});
+		})
+
+		// get all user
+		app.get('/user', verifyJWT, async(req, res) => {
+			const result = await usersCollections.find().toArray();
+			res.send(result);
+		})
+
+		// make admin
+		app.put('/makeAdmin/:email',verifyJWT, verifyAdmin , async(req, res) => {
+			const email = req.params.email;
+			const filter = {email: email};
+			const updateDoc = {
+				$set: {role:'admin'},
+			}
+			const result = await usersCollections.updateOne(filter, updateDoc);
+     		res.send(result);
 		})
 
 	}
