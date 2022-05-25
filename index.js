@@ -18,6 +18,26 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 
+
+function verifyJWT(req, res, next) {
+	const authHeader = req.headers.authorization;
+	console.log(authHeader);
+	if(!authHeader){
+	  return res.status(401).send({message: 'UnAuthorized Access 😆'});
+	}
+	const token = authHeader.split(' ')[1];
+	jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function(err, decoded) {
+	  if(err){
+		return res.status(403).send({message: 'Forbidden Access 😭'});
+	  }
+	  req.decoded = decoded;
+	  next();
+	});
+  }
+
+
+
+
 async function run() {
 	try{
 		await client.connect();
@@ -136,6 +156,30 @@ async function run() {
 			}
 			const result = await usersCollections.updateOne(filter,updateDoc);
 			res.send(result);
+		})
+
+		// my user profile get
+		app.get('/profile/:email',verifyJWT,async(req, res) => {
+			const email = req.params.email;
+			const decodedEmail = req.decoded.email;
+			if(email === decodedEmail){
+				const query = {email: email};
+				const result = await usersCollections.findOne(query);
+				res.send(result);
+			} else{
+				return res.status(403).send({message: 'Forbidden Access 😭'});
+			}
+			
+		})
+
+		// check admin
+		app.get('/admin/:email', async(req, res) => {
+			const email = req.params.email;
+			const user = await usersCollections.findOne({email: email});
+			// console.log(user);
+			const admin = user.role === 'admin';
+			// console.log(admin);
+			res.send({admin});
 		})
 
 	}
