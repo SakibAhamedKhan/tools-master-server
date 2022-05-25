@@ -26,7 +26,8 @@ async function run() {
 		const ordersCollections = client.db('tool_master_db').collection('orders');
 		const paymentsCollections = client.db('tool_master_db').collection('payments');
 
-		
+		console.log('mongodb connected');
+
 		// get all tools
 		app.get('/tools', async(req, res) => {
 			const result = await toolsCollections.find().toArray();
@@ -106,6 +107,15 @@ async function run() {
 			const updatedOrders = await ordersCollections.updateOne(filter, updatedDoc);
 			const result = await paymentsCollections.insertOne(payment);
 			res.send(updatedOrders);
+		})
+
+		// cancel order by user
+		app.delete('/myorders/:id', async(req, res) => {
+			const id = req.params.id;
+			const query = {_id: ObjectId(id)};
+			const result = await ordersCollections.deleteOne(query);
+			res.send(result);
+			// res.send({message:'ok'});
 		})
 
 	}
