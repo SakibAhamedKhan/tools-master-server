@@ -25,6 +25,7 @@ async function run() {
 		const usersCollections = client.db('tool_master_db').collection('users');
 		const ordersCollections = client.db('tool_master_db').collection('orders');
 		const paymentsCollections = client.db('tool_master_db').collection('payments');
+		const reviewsCollections = client.db('tool_master_db').collection('reviews');
 
 		console.log('mongodb connected');
 
@@ -116,6 +117,13 @@ async function run() {
 			const result = await ordersCollections.deleteOne(query);
 			res.send(result);
 			// res.send({message:'ok'});
+		})
+
+		// Add a review by user
+		app.post('/addreview', async(req, res) => {
+			const doc = req.body;
+			const result = await reviewsCollections.insertOne(doc);
+			res.send(result);
 		})
 
 	}
