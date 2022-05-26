@@ -252,6 +252,12 @@ async function run() {
 			const result = await ordersCollections.deleteOne(filter);
 			res.send(result);
 		})
+
+		// get all review
+		app.get('/review', async(req, res) => {
+			const result = await reviewsCollections.find().toArray();
+			res.send(result);
+		})
 	}
 	finally{
 
