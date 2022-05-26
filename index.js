@@ -216,6 +216,34 @@ async function run() {
 			const result = await toolsCollections.insertOne(doc);
 			res.send(result);
 		})
+
+		// get order for manage
+		app.get('/manageOrder',verifyJWT, async(req, res) => {
+			const result = await ordersCollections.find().toArray();
+			res.send(result);
+		})
+		
+		// add shipping true in order Collections
+		app.put('/manageOrder/:id', verifyJWT, verifyAdmin, async(req, res ) => {
+			const id = req.params.id;
+			const filter = {_id: ObjectId(id)};
+			const options = { upsert: true };
+			const updateDoc = {
+				$set: {
+				  shipping: true,
+				},
+			};
+			const result = await ordersCollections.updateOne(filter, updateDoc, options);
+			res.send(result);
+		})
+
+		// delete unpaid order from admin
+		app.delete('/manageOrder/:id', verifyJWT, verifyAdmin, async(req, res) => {
+			const id = req.params.id;
+			const filter = {_id: ObjectId(id)};
+			const result = await ordersCollections.deleteOne(filter);
+			res.send(result);
+		})
 	}
 	finally{
 
