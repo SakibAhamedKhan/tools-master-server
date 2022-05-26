@@ -66,6 +66,14 @@ async function run() {
 			res.send(result);
 		})
 
+		// delete a tool by id from admin
+		app.delete('/tools/:id', verifyJWT, verifyAdmin, async(req,res) => {
+			const id = req.params.id;
+			const filter = {_id: ObjectId(id)};
+			const result = await toolsCollections.deleteOne(filter);
+			res.send(result);
+		})
+
 		// add user 1st time when they signup
 		app.put('/user/:email', async(req, res) => {
 			const email = req.params.email;
